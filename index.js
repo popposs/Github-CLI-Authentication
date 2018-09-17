@@ -158,11 +158,10 @@ const run = async () => {
 	console.log( chalk.green( '😆 Token copied to clipboard!' ))
 }
 
-// MAIN //
 console.clear()
 console.log(
 	chalk.green(
-		figlet.textSync('Generate / Retrieve Github Token', {font: 'small', horizontalLayout: 'default', verticalLayout: 'default'})
+		figlet.textSync('Generate Github Token', {font: 'small', horizontalLayout: 'default', verticalLayout: 'default'})
 	)
 )
 
