@@ -105,13 +105,11 @@ const get_scopes = async () => {
 
 	// works because for duplicates (ex: gist, notifications), only one of key-value pair is deleted by splice
 	for (let i = 0; i < raw_scopes.length; i++) {
-		console.log(raw_scopes[i])
 		if (choices_keys.includes(raw_scopes[i])) {
 			raw_scopes.splice(i, 1)
 		}
 	}
 
-	console.log(raw_scopes)
 	return raw_scopes
 }
 
@@ -171,14 +169,4 @@ const run = async () => {
 	console.log( chalk.green( '😆 Token copied to clipboard!' ))
 }
 
-console.log(
-	chalk.green(
-		figlet.textSync('Generate Github Token', {font: 'small', horizontalLayout: 'default', verticalLayout: 'default'})
-	)
-)
-
-try {
-	run()
-} catch (error) {
-	console.log('Error: ', JSON.parse(error).message)
-}
+run()
