@@ -126,7 +126,8 @@ const register_two_auth_token = async (two_factor_code, scopes_, note_) => {
 		})
 		const token = response.data.token
 		if (token) {
-			conf.set('github.token', token)
+			status.stop()
+			return token
 		} else {
 			throw new Error('Missing Token', 'GitHub token was not found in the response')
 		}
@@ -135,13 +136,11 @@ const register_two_auth_token = async (two_factor_code, scopes_, note_) => {
 	} finally {
 		status.stop()
 	}
-
-	return token
 }
 
 const run = async () => {
 	await get_github_credentials()
-	const token = ''
+	let token = ''
 	const scopes = await get_scopes()
 	const note = await get_note()
 
@@ -150,7 +149,9 @@ const run = async () => {
 	} catch (error) {
 		const error_message = JSON.parse(error).message
 		if (error_message == 'Must specify two-factor authentication OTP code.') {
+			console.log('HERE')
 			token = await two_factor_auth(scopes, note)
+			console.log('HO')
 		}
 	}
 
@@ -158,11 +159,14 @@ const run = async () => {
 	console.log( chalk.green( '😆 Token copied to clipboard!' ))
 }
 
-console.clear()
 console.log(
 	chalk.green(
 		figlet.textSync('Generate Github Token', {font: 'small', horizontalLayout: 'default', verticalLayout: 'default'})
 	)
 )
 
-run()
+try {
+	run()
+} catch (error) {
+	console.log(JSON.parse(error).message)
+}
