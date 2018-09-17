@@ -80,25 +80,39 @@ const get_note = async () => {
 }
 
 const get_scopes = async () => {
+	choices_dict = {
+		'repo' : ['repo:status', 'repo_deployment', 'public_repo', 'repo:invite'],
+		'write' : ['write:org', 'read:org'],
+		'public_key' : ['write:public_key', 'read:public_key'],
+		'repo_hook' : ['write:repo_hook', 'read:repo_hook'],
+		'admin' : ['admin:org_hook'],
+		'gist' : ['gist'],
+		'notifications' : ['notifications'],
+		'user' : ['read:user', 'user:email', 'user:follow'],
+		'delete_repo' : ['delete_repo'],
+		'write:discussion' : ['read:discussion'],
+		'admin:gpg_key' : ['write:gpg_key', 'read:gpg_key']
+	}
+
 	let scope_prompt = new Checkbox({
 		name: 'scopes',
 		message: 'What are the scopes for this token?',
-		choices: {
-			'repo' : ['repo:status', 'repo_deployment', 'public_repo', 'repo:invite'],
-			'write' : ['write:org', 'read:org'],
-			'public_key' : ['write:public_key', 'read:public_key'],
-			'repo_hook' : ['write:repo_hook', 'read:repo_hook'],
-			'admin' : ['admin:org_hook'],
-			'gist' : ['gist'],
-			'notifications' : ['notifications'],
-			'user' : ['read:user', 'user:email', 'user:follow'],
-			'delete_repo' : ['delete_repo'],
-			'write:discussion' : ['read:discussion'],
-			'admin:gpg_key' : ['write:gpg_key', 'read:gpg_key']
-		}
+		choices: choices_dict
 	})
 
-	return await scope_prompt.run()
+	let raw_scopes = await scope_prompt.run()
+	let choices_keys = Object.keys(choices_dict)
+
+	// works because for duplicates (ex: gist, notifications), only one of key-value pair is deleted by splice
+	for (let i = 0; i < raw_scopes.length; i++) {
+		console.log(raw_scopes[i])
+		if (choices_keys.includes(raw_scopes[i])) {
+			raw_scopes.splice(i, 1)
+		}
+	}
+
+	console.log(raw_scopes)
+	return raw_scopes
 }
 
 const two_factor_auth = async (scopes, note) => {
@@ -149,9 +163,7 @@ const run = async () => {
 	} catch (error) {
 		const error_message = JSON.parse(error).message
 		if (error_message == 'Must specify two-factor authentication OTP code.') {
-			console.log('HERE')
 			token = await two_factor_auth(scopes, note)
-			console.log('HO')
 		}
 	}
 
@@ -168,5 +180,5 @@ console.log(
 try {
 	run()
 } catch (error) {
-	console.log(JSON.parse(error).message)
+	console.log('Error: ', JSON.parse(error).message)
 }
